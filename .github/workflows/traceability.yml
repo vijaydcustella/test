@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          persist-credentials: false  # This prevents GitHub Actions from using the default GITHUB_TOKEN
 
       - name: Get Latest Git Commit & Tag
         id: version
@@ -36,7 +38,7 @@ jobs:
 
       - name: Commit and Push Updates
         env:
-          PAT: ${{ secrets.ACTIONS_TEST_PAT }}  # Using your stored PAT
+          PAT: ${{ secrets.ACTIONS_TEST_PAT }}  # Ensure we're using your stored PAT
         run: |
           git config --global user.email "vijay@fieldex.com"
           git config --global user.name "vijaydcustella"
@@ -44,4 +46,4 @@ jobs:
           git pull origin main  # Ensure latest changes are pulled
           git add version_tracking.csv
           git commit -m "Updated tracking for commit $GIT_COMMIT" || echo "No changes to commit"
-          git push origin HEAD:main
+          git push origin main
