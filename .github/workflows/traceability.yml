@@ -43,12 +43,19 @@ jobs:
           git config --global user.email "vijay@fieldex.com"
           git config --global user.name "vijaydcustella"
           git remote set-url origin https://x-access-token:${{ secrets.ACTIONS_TEST_PAT }}@github.com/vijaydcustella/test.git
-          git pull origin main  # Ensure latest changes are pulled
+
+          # Ensure local changes are committed before pulling
           git add version_tracking.csv
           git commit -m "Updated tracking for commit $GIT_COMMIT" || echo "No changes to commit"
+
+          # Pull latest changes while handling conflicts automatically
+          git pull --rebase --autostash origin main || echo "No rebase needed"
+
+          # Push the committed changes
           git push origin main
 
-      - name: Send Email Notification  # ✅ New Step: Send email after successful commit
+      - name: Send Email Notification  # ✅ Send email only if the commit & push succeeded
+        if: success()
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com  # Replace with your SMTP server
