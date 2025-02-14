@@ -36,11 +36,12 @@ jobs:
 
       - name: Commit and Push Updates
         env:
-          PAT: ${{ secrets.ACTIONS_TEST_PAT }}  # Use the correct PAT from secrets
+          PAT: ${{ secrets.ACTIONS_TEST_PAT }}  # Ensure we're using your stored PAT
         run: |
           git config --global user.email "vijay@fieldex.com"
           git config --global user.name "vijaydcustella"
-          git remote set-url origin https://x-access-token:${{ secrets.ACTIONS_TEST_PAT }}@github.com/vijaydcustella/test.git
+          git remote remove origin
+          git remote add origin https://x-access-token:${{ secrets.ACTIONS_TEST_PAT }}@github.com/vijaydcustella/test.git
           git fetch --unshallow
           git pull origin main  # Ensure latest changes are pulled
           git add version_tracking.csv
