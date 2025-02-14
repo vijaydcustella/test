@@ -35,9 +35,12 @@ jobs:
           cat version_tracking.csv
 
       - name: Commit and Push Updates
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACTIONS_TEST_PAT }}  # Updated to use your GitHub secret
         run: |
-          git config --global user.email "bot@example.com"
-          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "vijay@fieldex.com"
+          git config --global user.name "vijaydcustella"
+          git remote set-url origin https://x-access-token:${{ secrets.ACTIONS_TEST_PAT }}@github.com/vijaydcustella/test.git
           git add version_tracking.csv
           git commit -m "Updated tracking for commit $GIT_COMMIT"
           git push origin main
