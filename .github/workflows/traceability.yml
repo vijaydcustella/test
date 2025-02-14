@@ -36,7 +36,7 @@ jobs:
 
       - name: Commit and Push Updates
         env:
-          GITHUB_TOKEN: ${{ secrets.ACTIONS_TEST_PAT }}  # Correctly using your secret
+          PAT: ${{ secrets.ACTIONS_TEST_PAT }}  # Use the correct PAT from secrets
         run: |
           git config --global user.email "vijay@fieldex.com"
           git config --global user.name "vijaydcustella"
