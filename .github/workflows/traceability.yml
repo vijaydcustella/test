@@ -13,7 +13,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: false  # This prevents GitHub Actions from using the default GITHUB_TOKEN
+          persist-credentials: false  # Prevents default GitHub Actions token from interfering
 
       - name: Get Latest Git Commit & Tag
         id: version
@@ -47,3 +47,24 @@ jobs:
           git add version_tracking.csv
           git commit -m "Updated tracking for commit $GIT_COMMIT" || echo "No changes to commit"
           git push origin main
+
+      - name: Send Email Notification  # ✅ New Step: Send email after successful commit
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com  # Replace with your SMTP server
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}  # Your email address stored in GitHub Secrets
+          password: ${{ secrets.EMAIL_PASSWORD }}  # Your email app password stored in GitHub Secrets
+          subject: "GitHub Actions: New Database Version Tracked 🚀"
+          body: |
+            ✅ A new database version has been tracked!
+            - **Date:** $(date +'%Y-%m-%d')
+            - **Database Version:** ${{ env.DB_VERSION }}
+            - **Application Commit:** ${{ env.GIT_COMMIT }}
+            - **Backup File:** backup_${{ env.DB_VERSION }}.sql
+            - **Repository:** [Test Repository](https://github.com/vijaydcustella/test)
+
+            📩 This is an automated notification from GitHub Actions.
+          to: "your-email@example.com"  # Replace with your email
+          from: "GitHub Actions Bot"
+          content_type: text/html
