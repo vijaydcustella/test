@@ -1,0 +1,43 @@
+name: Code & DB Version Tracking
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  track_versions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Get Latest Git Commit & Tag
+        id: version
+        run: |
+          echo "GIT_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "APP_VERSION=$(git describe --tags --abbrev=0 || echo 'v1.0.0')" >> $GITHUB_ENV
+          echo "GIT_COMMIT: $GIT_COMMIT"
+          echo "APP_VERSION: $APP_VERSION"
+
+      - name: Fetch Latest Database Schema Version
+        id: db_version
+        run: |
+          DB_VERSION=$(cat db/schema_version.txt || echo "v1.0.0")
+          echo "DB_VERSION=$DB_VERSION" >> $GITHUB_ENV
+          echo "Database Schema Version: $DB_VERSION"
+
+      - name: Append to Tracking Log
+        run: |
+          echo "$(date +'%Y-%m-%d'),$DB_VERSION,$GIT_COMMIT,backup_${DB_VERSION}.sql,Pending" >> version_tracking.csv
+          echo "Updated version_tracking.csv:"
+          cat version_tracking.csv
+
+      - name: Commit and Push Updates
+        run: |
+          git config --global user.email "bot@example.com"
+          git config --global user.name "GitHub Actions Bot"
+          git add version_tracking.csv
+          git commit -m "Updated tracking for commit $GIT_COMMIT"
+          git push origin main
